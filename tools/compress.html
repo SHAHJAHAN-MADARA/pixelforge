@@ -1,0 +1,101 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compress Image Online Free — Reduce File Size | PixelForge</title>
+<meta name="description" content="Compress JPEG, PNG, and WebP images online for free. Reduce file size up to 90% without losing quality. No upload — processes in your browser instantly.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://SHAHJAHAN-MADARA.github.io/pixelforge/tools/compress.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Compress Image Online Free — PixelForge">
+<meta property="og:description" content="Reduce image file size up to 90% without visible quality loss. Free, private, instant.">
+<meta name="theme-color" content="#07050e"><link rel="icon" href="../favicon.svg"><link rel="stylesheet" href="../assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Image Compressor","url":"https://SHAHJAHAN-MADARA.github.io/pixelforge/tools/compress.html","applicationCategory":"MultimediaApplication","offers":{"@type":"Offer","price":"0"},"description":"Compress images online for free. Reduce JPEG, PNG, WebP file sizes instantly in your browser."}</script>
+
+<header class="site-header"><div class="container nav"><a class="logo" href="../"><span class="logo-mark">PF</span><span>PixelForge</span></a><nav class="nav-links"><a href="compress.html">Compress</a><a href="resize.html">Resize</a><a href="png-to-jpg.html">Convert</a><a href="crop.html">Crop</a></nav><button class="nav-toggle" aria-label="Menu">☰</button></div></header>
+
+<main class="tool-page"><div class="container">
+  <div class="tool-head"><h1>Image Compressor</h1><p>Reduce file size up to 90%. Adjust quality with the slider — preview the result before downloading.</p></div>
+
+  <div class="workspace">
+    <div class="drop-zone" id="dz">
+      <div class="dz-icon">📦</div>
+      <div class="dz-text">Drop an image here or click to browse</div>
+      <div class="dz-hint">JPEG, PNG, WebP — up to 50 MB</div>
+      <input type="file" accept="image/*">
+    </div>
+
+    <div id="editor" class="hide">
+      <div class="opts-row" style="margin-top:20px">
+        <label class="field" style="flex:1;margin:0"><span class="lbl">Quality</span>
+          <div class="range-row"><input type="range" id="quality" min="1" max="100" value="80"><span class="range-val" id="qVal">80%</span></div>
+        </label>
+        <label class="field" style="width:140px;margin:0"><span class="lbl">Format</span>
+          <select class="input" id="fmt"><option value="image/jpeg">JPEG</option><option value="image/webp">WebP</option><option value="image/png">PNG</option></select>
+        </label>
+      </div>
+
+      <div class="preview-area"><canvas id="cvs"></canvas></div>
+      <div class="img-info">
+        <span>Original: <b id="origSize">—</b></span>
+        <span>Compressed: <b id="compSize">—</b></span>
+        <span>Saved: <b id="saved">—</b></span>
+        <span id="dims"></span>
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" id="dlBtn">⬇ Download compressed</button>
+        <button class="btn btn-outline" id="resetBtn">🔄 New image</button>
+      </div>
+    </div>
+  </div>
+</div></main>
+
+<footer class="site-footer"><div class="container"><div class="footer-bottom"><div>&copy; <span data-year></span> PixelForge</div><div><a href="../">Home</a></div></div></div></footer>
+
+<script src="../assets/common.js"></script>
+<script>
+var cvs = document.getElementById('cvs'), ctx = cvs.getContext('2d');
+var curImg, curBlob, origSize;
+
+PF.setupDrop(document.getElementById('dz'), function(f) {
+  origSize = f.size;
+  PF.readImage(f, function(img) {
+    curImg = img;
+    cvs.width = img.naturalWidth; cvs.height = img.naturalHeight;
+    document.getElementById('dims').textContent = img.naturalWidth + ' x ' + img.naturalHeight;
+    document.getElementById('dz').classList.add('hide');
+    document.getElementById('editor').classList.remove('hide');
+    compress();
+  });
+});
+
+function compress() {
+  var q = +document.getElementById('quality').value / 100;
+  var fmt = document.getElementById('fmt').value;
+  ctx.clearRect(0, 0, cvs.width, cvs.height);
+  if (fmt === 'image/jpeg') { ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cvs.width, cvs.height); }
+  ctx.drawImage(curImg, 0, 0);
+  cvs.toBlob(function(blob) {
+    curBlob = blob;
+    document.getElementById('origSize').textContent = PF.fmtBytes(origSize);
+    document.getElementById('compSize').textContent = PF.fmtBytes(blob.size);
+    var pct = Math.round((1 - blob.size / origSize) * 100);
+    document.getElementById('saved').textContent = (pct > 0 ? pct + '%' : 'larger');
+    document.getElementById('saved').style.color = pct > 0 ? 'var(--success)' : 'var(--danger)';
+  }, fmt, q);
+}
+
+document.getElementById('quality').addEventListener('input', function() {
+  document.getElementById('qVal').textContent = this.value + '%';
+  compress();
+});
+document.getElementById('fmt').addEventListener('change', compress);
+
+document.getElementById('dlBtn').addEventListener('click', function() {
+  if (!curBlob) return;
+  var ext = document.getElementById('fmt').value.split('/')[1];
+  PF.download(curBlob, 'compressed.' + ext);
+});
+document.getElementById('resetBtn').addEventListener('click', function() {
+  document.getElementById('dz').classList.remove('hide');
+  document.getElementById('editor').classList.add('hide');
+});
+</script>

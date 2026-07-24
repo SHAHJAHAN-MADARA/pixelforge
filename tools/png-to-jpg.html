@@ -1,0 +1,85 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Convert PNG to JPG Online Free — Instant | PixelForge</title>
+<meta name="description" content="Convert PNG images to JPG format online for free. Reduce file size by converting to JPEG. Set quality, choose background color. No upload, instant conversion.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://SHAHJAHAN-MADARA.github.io/pixelforge/tools/png-to-jpg.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="PNG to JPG Converter Free — PixelForge">
+<meta property="og:description" content="Convert PNG to JPG instantly in your browser. Set quality, choose background color.">
+<meta name="theme-color" content="#07050e"><link rel="icon" href="../favicon.svg"><link rel="stylesheet" href="../assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"PNG to JPG Converter","url":"https://SHAHJAHAN-MADARA.github.io/pixelforge/tools/png-to-jpg.html","applicationCategory":"MultimediaApplication","offers":{"@type":"Offer","price":"0"}}</script>
+
+<header class="site-header"><div class="container nav"><a class="logo" href="../"><span class="logo-mark">PF</span><span>PixelForge</span></a><nav class="nav-links"><a href="compress.html">Compress</a><a href="resize.html">Resize</a><a href="png-to-jpg.html">Convert</a><a href="crop.html">Crop</a></nav><button class="nav-toggle" aria-label="Menu">☰</button></div></header>
+
+<main class="tool-page"><div class="container">
+  <div class="tool-head"><h1>PNG to JPG Converter</h1><p>Convert PNG images to smaller JPG files. Choose quality and background color for transparent areas.</p></div>
+
+  <div class="workspace">
+    <div class="drop-zone" id="dz">
+      <div class="dz-icon">🖼️</div>
+      <div class="dz-text">Drop a PNG image here or click to browse</div>
+      <div class="dz-hint">PNG files — up to 50 MB</div>
+      <input type="file" accept="image/png,image/*">
+    </div>
+
+    <div id="editor" class="hide">
+      <div class="opts-row" style="margin-top:20px">
+        <label class="field" style="flex:1;margin:0"><span class="lbl">JPG Quality</span>
+          <div class="range-row"><input type="range" id="quality" min="1" max="100" value="92"><span class="range-val" id="qVal">92%</span></div>
+        </label>
+        <label class="field" style="margin:0"><span class="lbl">Background</span>
+          <div class="color-input"><input type="color" id="bg" value="#ffffff"><input class="input" type="text" id="bgHex" value="#ffffff" style="width:90px"></div>
+        </label>
+      </div>
+
+      <div class="preview-area"><canvas id="cvs"></canvas></div>
+      <div class="img-info"><span>Original PNG: <b id="origSize">—</b></span><span>JPG: <b id="jpgSize">—</b></span><span>Saved: <b id="saved">—</b></span></div>
+      <div class="actions">
+        <button class="btn btn-primary" id="dlBtn">⬇ Download JPG</button>
+        <button class="btn btn-outline" id="resetBtn">🔄 New image</button>
+      </div>
+    </div>
+  </div>
+</div></main>
+
+<footer class="site-footer"><div class="container"><div class="footer-bottom"><div>&copy; <span data-year></span> PixelForge</div><div><a href="../">Home</a></div></div></div></footer>
+
+<script src="../assets/common.js"></script>
+<script>
+var cvs = document.getElementById('cvs'), ctx = cvs.getContext('2d');
+var curImg, origSize, curBlob;
+
+PF.setupDrop(document.getElementById('dz'), function(f) {
+  origSize = f.size;
+  PF.readImage(f, function(img) {
+    curImg = img; cvs.width = img.naturalWidth; cvs.height = img.naturalHeight;
+    document.getElementById('dz').classList.add('hide');
+    document.getElementById('editor').classList.remove('hide');
+    convert();
+  });
+});
+
+function convert() {
+  var q = +document.getElementById('quality').value / 100;
+  var bg = document.getElementById('bg').value;
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, cvs.width, cvs.height);
+  ctx.drawImage(curImg, 0, 0);
+  cvs.toBlob(function(blob) {
+    curBlob = blob;
+    document.getElementById('origSize').textContent = PF.fmtBytes(origSize);
+    document.getElementById('jpgSize').textContent = PF.fmtBytes(blob.size);
+    var pct = Math.round((1 - blob.size / origSize) * 100);
+    document.getElementById('saved').textContent = pct > 0 ? pct + '%' : 'larger';
+  }, 'image/jpeg', q);
+}
+
+document.getElementById('quality').addEventListener('input', function() { document.getElementById('qVal').textContent = this.value + '%'; convert(); });
+document.getElementById('bg').addEventListener('input', function() { document.getElementById('bgHex').value = this.value; convert(); });
+document.getElementById('bgHex').addEventListener('input', function() { document.getElementById('bg').value = this.value; convert(); });
+
+document.getElementById('dlBtn').addEventListener('click', function() { if (curBlob) PF.download(curBlob, 'converted.jpg'); });
+document.getElementById('resetBtn').addEventListener('click', function() {
+  document.getElementById('dz').classList.remove('hide'); document.getElementById('editor').classList.add('hide');
+});
+</script>

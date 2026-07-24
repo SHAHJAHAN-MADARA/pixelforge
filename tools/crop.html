@@ -1,0 +1,125 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crop Image Online Free — Custom Dimensions | PixelForge</title>
+<meta name="description" content="Crop images online for free. Select exact area to crop with a visual selection box. Supports JPEG, PNG, WebP. No upload — instant cropping in your browser.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://SHAHJAHAN-MADARA.github.io/pixelforge/tools/crop.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Crop Image Online Free — PixelForge">
+<meta property="og:description" content="Crop images to exact dimensions with a visual selection box. Free and private.">
+<meta name="theme-color" content="#07050e"><link rel="icon" href="../favicon.svg"><link rel="stylesheet" href="../assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Image Cropper","url":"https://SHAHJAHAN-MADARA.github.io/pixelforge/tools/crop.html","applicationCategory":"MultimediaApplication","offers":{"@type":"Offer","price":"0"}}</script>
+<style>
+.crop-container { position: relative; display: inline-block; max-width: 100%; cursor: crosshair; }
+.crop-container img { max-width: 100%; max-height: 500px; display: block; }
+.crop-overlay { position: absolute; border: 2px dashed var(--accent); background: rgba(139,92,246,.1); pointer-events: none; }
+</style>
+
+<header class="site-header"><div class="container nav"><a class="logo" href="../"><span class="logo-mark">PF</span><span>PixelForge</span></a><nav class="nav-links"><a href="compress.html">Compress</a><a href="resize.html">Resize</a><a href="png-to-jpg.html">Convert</a><a href="crop.html">Crop</a></nav><button class="nav-toggle" aria-label="Menu">☰</button></div></header>
+
+<main class="tool-page"><div class="container">
+  <div class="tool-head"><h1>Image Cropper</h1><p>Click and drag on the image to select the area you want to keep, or enter exact pixel values.</p></div>
+
+  <div class="workspace">
+    <div class="drop-zone" id="dz">
+      <div class="dz-icon">✂️</div>
+      <div class="dz-text">Drop an image here or click to browse</div>
+      <div class="dz-hint">JPEG, PNG, WebP — up to 50 MB</div>
+      <input type="file" accept="image/*">
+    </div>
+
+    <div id="editor" class="hide">
+      <div class="opts-row" style="margin-top:20px">
+        <label class="field" style="margin:0"><span class="lbl">X</span><input class="input" type="number" id="cx" value="0" min="0" style="width:90px"></label>
+        <label class="field" style="margin:0"><span class="lbl">Y</span><input class="input" type="number" id="cy" value="0" min="0" style="width:90px"></label>
+        <label class="field" style="margin:0"><span class="lbl">Width</span><input class="input" type="number" id="cw" min="1" style="width:100px"></label>
+        <label class="field" style="margin:0"><span class="lbl">Height</span><input class="input" type="number" id="ch" min="1" style="width:100px"></label>
+        <button class="btn btn-sm btn-outline" id="selectAll">Select all</button>
+      </div>
+
+      <div class="preview-area">
+        <div class="crop-container" id="cropBox">
+          <img id="srcImg">
+          <div class="crop-overlay" id="overlay"></div>
+        </div>
+      </div>
+      <canvas id="cvs" class="hide"></canvas>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="dlBtn">⬇ Download cropped</button>
+        <button class="btn btn-outline" id="resetBtn">🔄 New image</button>
+      </div>
+    </div>
+  </div>
+</div></main>
+
+<footer class="site-footer"><div class="container"><div class="footer-bottom"><div>&copy; <span data-year></span> PixelForge</div><div><a href="../">Home</a></div></div></div></footer>
+
+<script src="../assets/common.js"></script>
+<script>
+var srcImg = document.getElementById('srcImg'), cvs = document.getElementById('cvs'), ctx = cvs.getContext('2d');
+var overlay = document.getElementById('overlay'), cropBox = document.getElementById('cropBox');
+var curImg, natW, natH, scale = 1;
+var dragging = false, sx, sy;
+
+PF.setupDrop(document.getElementById('dz'), function(f) {
+  PF.readImage(f, function(img) {
+    curImg = img; natW = img.naturalWidth; natH = img.naturalHeight;
+    srcImg.src = img.src;
+    srcImg.onload = function() {
+      scale = natW / srcImg.clientWidth;
+      document.getElementById('cw').value = natW;
+      document.getElementById('ch').value = natH;
+      document.getElementById('cx').value = 0;
+      document.getElementById('cy').value = 0;
+      updateOverlay();
+    };
+    document.getElementById('dz').classList.add('hide');
+    document.getElementById('editor').classList.remove('hide');
+  });
+});
+
+function updateOverlay() {
+  var x = +document.getElementById('cx').value, y = +document.getElementById('cy').value;
+  var w = +document.getElementById('cw').value, h = +document.getElementById('ch').value;
+  overlay.style.left = (x / scale) + 'px'; overlay.style.top = (y / scale) + 'px';
+  overlay.style.width = (w / scale) + 'px'; overlay.style.height = (h / scale) + 'px';
+}
+
+cropBox.addEventListener('mousedown', function(e) {
+  var r = srcImg.getBoundingClientRect();
+  dragging = true; sx = e.clientX - r.left; sy = e.clientY - r.top;
+});
+document.addEventListener('mousemove', function(e) {
+  if (!dragging) return;
+  var r = srcImg.getBoundingClientRect();
+  var ex = e.clientX - r.left, ey = e.clientY - r.top;
+  var x1 = Math.max(0, Math.min(sx, ex)), y1 = Math.max(0, Math.min(sy, ey));
+  var x2 = Math.min(srcImg.clientWidth, Math.max(sx, ex)), y2 = Math.min(srcImg.clientHeight, Math.max(sy, ey));
+  document.getElementById('cx').value = Math.round(x1 * scale);
+  document.getElementById('cy').value = Math.round(y1 * scale);
+  document.getElementById('cw').value = Math.round((x2 - x1) * scale);
+  document.getElementById('ch').value = Math.round((y2 - y1) * scale);
+  updateOverlay();
+});
+document.addEventListener('mouseup', function() { dragging = false; });
+
+['cx','cy','cw','ch'].forEach(function(id) { document.getElementById(id).addEventListener('input', updateOverlay); });
+document.getElementById('selectAll').addEventListener('click', function() {
+  document.getElementById('cx').value = 0; document.getElementById('cy').value = 0;
+  document.getElementById('cw').value = natW; document.getElementById('ch').value = natH;
+  updateOverlay();
+});
+
+document.getElementById('dlBtn').addEventListener('click', function() {
+  var x = +document.getElementById('cx').value, y = +document.getElementById('cy').value;
+  var w = +document.getElementById('cw').value, h = +document.getElementById('ch').value;
+  if (w < 1 || h < 1) { PF.toast('Select an area first', true); return; }
+  cvs.width = w; cvs.height = h;
+  ctx.drawImage(curImg, x, y, w, h, 0, 0, w, h);
+  cvs.toBlob(function(b) { PF.download(b, 'cropped.png'); }, 'image/png');
+});
+document.getElementById('resetBtn').addEventListener('click', function() {
+  document.getElementById('dz').classList.remove('hide'); document.getElementById('editor').classList.add('hide');
+});
+</script>

@@ -1,0 +1,64 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Convert JPG to PNG Online Free — Lossless | PixelForge</title>
+<meta name="description" content="Convert JPG images to PNG format online for free. Get lossless quality with transparency support. No upload — instant conversion in your browser.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://SHAHJAHAN-MADARA.github.io/pixelforge/tools/jpg-to-png.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="JPG to PNG Converter Free — PixelForge">
+<meta property="og:description" content="Convert JPG to lossless PNG instantly. Transparency support included.">
+<meta name="theme-color" content="#07050e"><link rel="icon" href="../favicon.svg"><link rel="stylesheet" href="../assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"JPG to PNG Converter","url":"https://SHAHJAHAN-MADARA.github.io/pixelforge/tools/jpg-to-png.html","applicationCategory":"MultimediaApplication","offers":{"@type":"Offer","price":"0"}}</script>
+
+<header class="site-header"><div class="container nav"><a class="logo" href="../"><span class="logo-mark">PF</span><span>PixelForge</span></a><nav class="nav-links"><a href="compress.html">Compress</a><a href="resize.html">Resize</a><a href="png-to-jpg.html">Convert</a><a href="crop.html">Crop</a></nav><button class="nav-toggle" aria-label="Menu">☰</button></div></header>
+
+<main class="tool-page"><div class="container">
+  <div class="tool-head"><h1>JPG to PNG Converter</h1><p>Convert JPEG images to lossless PNG format. No quality loss, supports transparency.</p></div>
+
+  <div class="workspace">
+    <div class="drop-zone" id="dz">
+      <div class="dz-icon">🎨</div>
+      <div class="dz-text">Drop a JPG image here or click to browse</div>
+      <div class="dz-hint">JPEG files — up to 50 MB</div>
+      <input type="file" accept="image/jpeg,image/*">
+    </div>
+
+    <div id="editor" class="hide">
+      <div class="preview-area" style="margin-top:20px"><canvas id="cvs"></canvas></div>
+      <div class="img-info"><span>Original JPG: <b id="origSize">—</b></span><span>PNG: <b id="pngSize">—</b></span><span id="dims"></span></div>
+      <div class="actions">
+        <button class="btn btn-primary" id="dlBtn">⬇ Download PNG</button>
+        <button class="btn btn-outline" id="resetBtn">🔄 New image</button>
+      </div>
+    </div>
+  </div>
+</div></main>
+
+<footer class="site-footer"><div class="container"><div class="footer-bottom"><div>&copy; <span data-year></span> PixelForge</div><div><a href="../">Home</a></div></div></div></footer>
+
+<script src="../assets/common.js"></script>
+<script>
+var cvs = document.getElementById('cvs'), ctx = cvs.getContext('2d');
+var curBlob, origSize;
+
+PF.setupDrop(document.getElementById('dz'), function(f) {
+  origSize = f.size;
+  PF.readImage(f, function(img) {
+    cvs.width = img.naturalWidth; cvs.height = img.naturalHeight;
+    ctx.drawImage(img, 0, 0);
+    document.getElementById('dims').textContent = img.naturalWidth + ' x ' + img.naturalHeight;
+    document.getElementById('dz').classList.add('hide');
+    document.getElementById('editor').classList.remove('hide');
+    cvs.toBlob(function(blob) {
+      curBlob = blob;
+      document.getElementById('origSize').textContent = PF.fmtBytes(origSize);
+      document.getElementById('pngSize').textContent = PF.fmtBytes(blob.size);
+    }, 'image/png');
+  });
+});
+
+document.getElementById('dlBtn').addEventListener('click', function() { if (curBlob) PF.download(curBlob, 'converted.png'); });
+document.getElementById('resetBtn').addEventListener('click', function() {
+  document.getElementById('dz').classList.remove('hide'); document.getElementById('editor').classList.add('hide');
+});
+</script>

@@ -1,0 +1,101 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pick Color from Image Online Free — HEX, RGB, HSL | PixelForge</title>
+<meta name="description" content="Pick any color from your image and get HEX, RGB, and HSL values instantly. Free online eyedropper tool — no upload, works in your browser.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://SHAHJAHAN-MADARA.github.io/pixelforge/tools/color-picker.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Color Picker from Image — PixelForge">
+<meta property="og:description" content="Pick any color from an image. Get HEX, RGB, HSL values instantly.">
+<meta name="theme-color" content="#07050e"><link rel="icon" href="../favicon.svg"><link rel="stylesheet" href="../assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Color Picker from Image","url":"https://SHAHJAHAN-MADARA.github.io/pixelforge/tools/color-picker.html","applicationCategory":"DesignApplication","offers":{"@type":"Offer","price":"0"}}</script>
+<style>
+.color-result { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-top: 20px; padding: 20px; background: var(--bg-elev); border: 1px solid var(--border); border-radius: var(--radius); }
+.color-swatch { width: 80px; height: 80px; border-radius: var(--radius-sm); border: 2px solid var(--border); flex-shrink: 0; }
+.color-vals { display: grid; gap: 6px; flex: 1; }
+.color-vals .cv { display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 14px; }
+.color-vals .cv label { color: var(--text-muted); font-size: 11px; text-transform: uppercase; min-width: 32px; }
+.color-vals .cv input { background: var(--bg-solid); border: 1px solid var(--border); color: var(--text); padding: 6px 10px; border-radius: 6px; font-family: var(--font-mono); font-size: 13px; width: 180px; cursor: pointer; }
+.pick-canvas { cursor: crosshair; }
+</style>
+
+<header class="site-header"><div class="container nav"><a class="logo" href="../"><span class="logo-mark">PF</span><span>PixelForge</span></a><nav class="nav-links"><a href="compress.html">Compress</a><a href="resize.html">Resize</a><a href="png-to-jpg.html">Convert</a><a href="crop.html">Crop</a></nav><button class="nav-toggle" aria-label="Menu">☰</button></div></header>
+
+<main class="tool-page"><div class="container">
+  <div class="tool-head"><h1>Color Picker from Image</h1><p>Click anywhere on your image to pick a color. Get HEX, RGB, and HSL values.</p></div>
+
+  <div class="workspace">
+    <div class="drop-zone" id="dz">
+      <div class="dz-icon">🎯</div>
+      <div class="dz-text">Drop an image here or click to browse</div>
+      <div class="dz-hint">JPEG, PNG, WebP — up to 50 MB</div>
+      <input type="file" accept="image/*">
+    </div>
+
+    <div id="editor" class="hide">
+      <div class="preview-area" style="margin-top:20px"><canvas id="cvs" class="pick-canvas"></canvas></div>
+
+      <div class="color-result" id="result" style="display:none">
+        <div class="color-swatch" id="swatch"></div>
+        <div class="color-vals">
+          <div class="cv"><label>HEX</label><input id="vHex" readonly onclick="this.select();document.execCommand('copy');PF.toast('Copied!')"></div>
+          <div class="cv"><label>RGB</label><input id="vRgb" readonly onclick="this.select();document.execCommand('copy');PF.toast('Copied!')"></div>
+          <div class="cv"><label>HSL</label><input id="vHsl" readonly onclick="this.select();document.execCommand('copy');PF.toast('Copied!')"></div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-outline" id="resetBtn">🔄 New image</button>
+      </div>
+    </div>
+  </div>
+</div></main>
+
+<footer class="site-footer"><div class="container"><div class="footer-bottom"><div>&copy; <span data-year></span> PixelForge</div><div><a href="../">Home</a></div></div></div></footer>
+
+<script src="../assets/common.js"></script>
+<script>
+var cvs = document.getElementById('cvs'), ctx = cvs.getContext('2d');
+
+PF.setupDrop(document.getElementById('dz'), function(f) {
+  PF.readImage(f, function(img) {
+    cvs.width = img.naturalWidth; cvs.height = img.naturalHeight;
+    ctx.drawImage(img, 0, 0);
+    document.getElementById('dz').classList.add('hide');
+    document.getElementById('editor').classList.remove('hide');
+  });
+});
+
+cvs.addEventListener('click', function(e) {
+  var rect = cvs.getBoundingClientRect();
+  var sx = (e.clientX - rect.left) * (cvs.width / rect.width);
+  var sy = (e.clientY - rect.top) * (cvs.height / rect.height);
+  var p = ctx.getImageData(Math.round(sx), Math.round(sy), 1, 1).data;
+  var r = p[0], g = p[1], b = p[2];
+
+  var hex = '#' + [r, g, b].map(function(v) { return v.toString(16).padStart(2, '0'); }).join('');
+  var rgb = 'rgb(' + r + ', ' + g + ', ' + b + ')';
+
+  var rn = r / 255, gn = g / 255, bn = b / 255;
+  var max = Math.max(rn, gn, bn), min = Math.min(rn, gn, bn), d = max - min;
+  var h = 0, s = 0, l = (max + min) / 2;
+  if (d > 0) {
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    if (max === rn) h = ((gn - bn) / d + (gn < bn ? 6 : 0)) / 6;
+    else if (max === gn) h = ((bn - rn) / d + 2) / 6;
+    else h = ((rn - gn) / d + 4) / 6;
+  }
+  var hsl = 'hsl(' + Math.round(h * 360) + ', ' + Math.round(s * 100) + '%, ' + Math.round(l * 100) + '%)';
+
+  document.getElementById('swatch').style.background = hex;
+  document.getElementById('vHex').value = hex;
+  document.getElementById('vRgb').value = rgb;
+  document.getElementById('vHsl').value = hsl;
+  document.getElementById('result').style.display = '';
+});
+
+document.getElementById('resetBtn').addEventListener('click', function() {
+  document.getElementById('dz').classList.remove('hide'); document.getElementById('editor').classList.add('hide');
+  document.getElementById('result').style.display = 'none';
+});
+</script>

@@ -1,0 +1,77 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image to Base64 Online Free — Data URI Encoder | PixelForge</title>
+<meta name="description" content="Convert images to base64 data URIs for embedding in HTML, CSS, or JavaScript. Free online tool — no upload, instant conversion in your browser.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://SHAHJAHAN-MADARA.github.io/pixelforge/tools/to-base64.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Image to Base64 Converter — PixelForge">
+<meta property="og:description" content="Convert images to base64 data URIs for embedding in code. Free and instant.">
+<meta name="theme-color" content="#07050e"><link rel="icon" href="../favicon.svg"><link rel="stylesheet" href="../assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Image to Base64","url":"https://SHAHJAHAN-MADARA.github.io/pixelforge/tools/to-base64.html","applicationCategory":"DeveloperApplication","offers":{"@type":"Offer","price":"0"}}</script>
+
+<header class="site-header"><div class="container nav"><a class="logo" href="../"><span class="logo-mark">PF</span><span>PixelForge</span></a><nav class="nav-links"><a href="compress.html">Compress</a><a href="resize.html">Resize</a><a href="png-to-jpg.html">Convert</a><a href="crop.html">Crop</a></nav><button class="nav-toggle" aria-label="Menu">☰</button></div></header>
+
+<main class="tool-page"><div class="container">
+  <div class="tool-head"><h1>Image to Base64</h1><p>Convert any image to a base64 data URI you can embed directly in HTML, CSS, or JS.</p></div>
+
+  <div class="workspace">
+    <div class="drop-zone" id="dz">
+      <div class="dz-icon">🔣</div>
+      <div class="dz-text">Drop an image here or click to browse</div>
+      <div class="dz-hint">JPEG, PNG, WebP, SVG, GIF — up to 10 MB</div>
+      <input type="file" accept="image/*">
+    </div>
+
+    <div id="editor" class="hide">
+      <div class="preview-area" style="margin-top:20px"><img id="preview" style="max-height:200px"></div>
+      <div class="img-info"><span>File: <b id="fname">—</b></span><span>Size: <b id="fsize">—</b></span><span>Base64 length: <b id="b64len">—</b></span></div>
+
+      <label class="field" style="margin-top:16px"><span class="lbl">Data URI</span>
+        <textarea class="input" id="out" readonly style="min-height:160px;font-family:var(--font-mono);font-size:12px;word-break:break-all"></textarea>
+      </label>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="copyBtn">📋 Copy data URI</button>
+        <button class="btn btn-outline" id="copyImg">📋 Copy &lt;img&gt; tag</button>
+        <button class="btn btn-outline" id="copyCss">📋 Copy CSS url()</button>
+        <button class="btn btn-outline" id="resetBtn">🔄 New image</button>
+      </div>
+    </div>
+  </div>
+</div></main>
+
+<footer class="site-footer"><div class="container"><div class="footer-bottom"><div>&copy; <span data-year></span> PixelForge</div><div><a href="../">Home</a></div></div></div></footer>
+
+<script src="../assets/common.js"></script>
+<script>
+var dataUri = '';
+
+PF.setupDrop(document.getElementById('dz'), function(f) {
+  document.getElementById('fname').textContent = f.name;
+  document.getElementById('fsize').textContent = PF.fmtBytes(f.size);
+  var reader = new FileReader();
+  reader.onload = function() {
+    dataUri = reader.result;
+    document.getElementById('preview').src = dataUri;
+    document.getElementById('out').value = dataUri;
+    document.getElementById('b64len').textContent = dataUri.length.toLocaleString() + ' chars';
+    document.getElementById('dz').classList.add('hide');
+    document.getElementById('editor').classList.remove('hide');
+  };
+  reader.readAsDataURL(f);
+});
+
+document.getElementById('copyBtn').addEventListener('click', function() {
+  navigator.clipboard.writeText(dataUri).then(function() { PF.toast('Copied data URI!'); });
+});
+document.getElementById('copyImg').addEventListener('click', function() {
+  navigator.clipboard.writeText('<img src="' + dataUri + '" alt="">').then(function() { PF.toast('Copied <img> tag!'); });
+});
+document.getElementById('copyCss').addEventListener('click', function() {
+  navigator.clipboard.writeText("url('" + dataUri + "')").then(function() { PF.toast('Copied CSS url()!'); });
+});
+document.getElementById('resetBtn').addEventListener('click', function() {
+  document.getElementById('dz').classList.remove('hide'); document.getElementById('editor').classList.add('hide');
+});
+</script>

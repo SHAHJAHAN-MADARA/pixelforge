@@ -1,0 +1,94 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Filters Online Free — Brightness, Contrast, Blur | PixelForge</title>
+<meta name="description" content="Apply filters to images online for free. Adjust brightness, contrast, saturation, add grayscale, sepia, or blur effects. No upload — instant results in your browser.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://SHAHJAHAN-MADARA.github.io/pixelforge/tools/filters.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Image Filters Online Free — PixelForge">
+<meta property="og:description" content="Adjust brightness, contrast, saturation. Apply grayscale, sepia, blur effects instantly.">
+<meta name="theme-color" content="#07050e"><link rel="icon" href="../favicon.svg"><link rel="stylesheet" href="../assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Image Filters","url":"https://SHAHJAHAN-MADARA.github.io/pixelforge/tools/filters.html","applicationCategory":"MultimediaApplication","offers":{"@type":"Offer","price":"0"}}</script>
+
+<header class="site-header"><div class="container nav"><a class="logo" href="../"><span class="logo-mark">PF</span><span>PixelForge</span></a><nav class="nav-links"><a href="compress.html">Compress</a><a href="resize.html">Resize</a><a href="png-to-jpg.html">Convert</a><a href="crop.html">Crop</a></nav><button class="nav-toggle" aria-label="Menu">☰</button></div></header>
+
+<main class="tool-page"><div class="container">
+  <div class="tool-head"><h1>Image Filters</h1><p>Adjust brightness, contrast, saturation, and apply effects like grayscale, sepia, and blur.</p></div>
+
+  <div class="workspace">
+    <div class="drop-zone" id="dz">
+      <div class="dz-icon">✨</div>
+      <div class="dz-text">Drop an image here or click to browse</div>
+      <div class="dz-hint">JPEG, PNG, WebP — up to 50 MB</div>
+      <input type="file" accept="image/*">
+    </div>
+
+    <div id="editor" class="hide">
+      <div class="opts-grid" style="margin-top:20px">
+        <label class="field"><span class="lbl">Brightness</span><div class="range-row"><input type="range" data-f="brightness" min="0" max="200" value="100"><span class="range-val">100%</span></div></label>
+        <label class="field"><span class="lbl">Contrast</span><div class="range-row"><input type="range" data-f="contrast" min="0" max="200" value="100"><span class="range-val">100%</span></div></label>
+        <label class="field"><span class="lbl">Saturation</span><div class="range-row"><input type="range" data-f="saturate" min="0" max="200" value="100"><span class="range-val">100%</span></div></label>
+        <label class="field"><span class="lbl">Blur (px)</span><div class="range-row"><input type="range" data-f="blur" min="0" max="20" value="0"><span class="range-val">0</span></div></label>
+        <label class="field"><span class="lbl">Grayscale</span><div class="range-row"><input type="range" data-f="grayscale" min="0" max="100" value="0"><span class="range-val">0%</span></div></label>
+        <label class="field"><span class="lbl">Sepia</span><div class="range-row"><input type="range" data-f="sepia" min="0" max="100" value="0"><span class="range-val">0%</span></div></label>
+        <label class="field"><span class="lbl">Hue Rotate</span><div class="range-row"><input type="range" data-f="hue-rotate" min="0" max="360" value="0"><span class="range-val">0°</span></div></label>
+        <label class="field"><span class="lbl">Invert</span><div class="range-row"><input type="range" data-f="invert" min="0" max="100" value="0"><span class="range-val">0%</span></div></label>
+      </div>
+      <div class="actions" style="margin-top:0;margin-bottom:16px"><button class="btn btn-sm btn-outline" id="resetFilters">Reset all filters</button></div>
+
+      <div class="preview-area"><canvas id="cvs"></canvas></div>
+      <div class="actions">
+        <button class="btn btn-primary" id="dlBtn">⬇ Download</button>
+        <button class="btn btn-outline" id="resetBtn">🔄 New image</button>
+      </div>
+    </div>
+  </div>
+</div></main>
+
+<footer class="site-footer"><div class="container"><div class="footer-bottom"><div>&copy; <span data-year></span> PixelForge</div><div><a href="../">Home</a></div></div></div></footer>
+
+<script src="../assets/common.js"></script>
+<script>
+var cvs = document.getElementById('cvs'), ctx = cvs.getContext('2d');
+var curImg, sliders = document.querySelectorAll('[data-f]');
+
+PF.setupDrop(document.getElementById('dz'), function(f) {
+  PF.readImage(f, function(img) {
+    curImg = img; cvs.width = img.naturalWidth; cvs.height = img.naturalHeight;
+    document.getElementById('dz').classList.add('hide');
+    document.getElementById('editor').classList.remove('hide');
+    render();
+  });
+});
+
+function render() {
+  var parts = [];
+  sliders.forEach(function(s) {
+    var f = s.dataset.f, v = s.value;
+    var unit = f === 'blur' ? 'px' : f === 'hue-rotate' ? 'deg' : '%';
+    parts.push(f + '(' + v + unit + ')');
+    s.nextElementSibling.textContent = v + (f === 'blur' ? '' : f === 'hue-rotate' ? '°' : '%');
+  });
+  ctx.clearRect(0, 0, cvs.width, cvs.height);
+  ctx.filter = parts.join(' ');
+  ctx.drawImage(curImg, 0, 0);
+  ctx.filter = 'none';
+}
+
+sliders.forEach(function(s) { s.addEventListener('input', render); });
+
+document.getElementById('resetFilters').addEventListener('click', function() {
+  sliders.forEach(function(s) {
+    var f = s.dataset.f;
+    s.value = (f === 'brightness' || f === 'contrast' || f === 'saturate') ? 100 : 0;
+  });
+  render();
+});
+
+document.getElementById('dlBtn').addEventListener('click', function() {
+  cvs.toBlob(function(b) { PF.download(b, 'filtered.png'); }, 'image/png');
+});
+document.getElementById('resetBtn').addEventListener('click', function() {
+  document.getElementById('dz').classList.remove('hide'); document.getElementById('editor').classList.add('hide');
+});
+</script>

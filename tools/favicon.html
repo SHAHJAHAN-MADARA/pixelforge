@@ -1,0 +1,92 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Favicon Generator Online Free — All Sizes | PixelForge</title>
+<meta name="description" content="Generate favicons in all standard sizes (16x16, 32x32, 48x48, 64x64, 128x128, 256x256) from a single image. Free online tool — no upload required.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://SHAHJAHAN-MADARA.github.io/pixelforge/tools/favicon.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Favicon Generator Free — PixelForge">
+<meta property="og:description" content="Generate favicons in all sizes from a single image. Download individual PNGs.">
+<meta name="theme-color" content="#07050e"><link rel="icon" href="../favicon.svg"><link rel="stylesheet" href="../assets/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Favicon Generator","url":"https://SHAHJAHAN-MADARA.github.io/pixelforge/tools/favicon.html","applicationCategory":"DeveloperApplication","offers":{"@type":"Offer","price":"0"}}</script>
+<style>
+.fav-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px; margin-top: 20px; }
+.fav-item { background: var(--bg-elev); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px; text-align: center; }
+.fav-item canvas { background: repeating-conic-gradient(#80808015 0 25%, transparent 0 50%) 0 0/10px 10px; border-radius: 4px; image-rendering: pixelated; }
+.fav-item .sz { font-size: 12px; color: var(--text-dim); margin: 8px 0 6px; }
+.fav-item .btn { width: 100%; }
+</style>
+
+<header class="site-header"><div class="container nav"><a class="logo" href="../"><span class="logo-mark">PF</span><span>PixelForge</span></a><nav class="nav-links"><a href="compress.html">Compress</a><a href="resize.html">Resize</a><a href="png-to-jpg.html">Convert</a><a href="crop.html">Crop</a></nav><button class="nav-toggle" aria-label="Menu">☰</button></div></header>
+
+<main class="tool-page"><div class="container">
+  <div class="tool-head"><h1>Favicon Generator</h1><p>Upload any image and generate favicons in all standard sizes for your website.</p></div>
+
+  <div class="workspace">
+    <div class="drop-zone" id="dz">
+      <div class="dz-icon">⭐</div>
+      <div class="dz-text">Drop an image here or click to browse</div>
+      <div class="dz-hint">Square images work best — JPEG, PNG, SVG</div>
+      <input type="file" accept="image/*">
+    </div>
+
+    <div id="editor" class="hide">
+      <div class="fav-grid" id="grid"></div>
+      <div class="actions" style="margin-top:20px">
+        <button class="btn btn-outline" id="resetBtn">🔄 New image</button>
+      </div>
+    </div>
+  </div>
+</div></main>
+
+<footer class="site-footer"><div class="container"><div class="footer-bottom"><div>&copy; <span data-year></span> PixelForge</div><div><a href="../">Home</a></div></div></div></footer>
+
+<script src="../assets/common.js"></script>
+<script>
+var sizes = [16, 32, 48, 64, 128, 180, 192, 256, 512];
+
+PF.setupDrop(document.getElementById('dz'), function(f) {
+  PF.readImage(f, function(img) {
+    var grid = document.getElementById('grid');
+    grid.innerHTML = '';
+    sizes.forEach(function(s) {
+      var cvs = document.createElement('canvas');
+      cvs.width = s; cvs.height = s;
+      var ctx = cvs.getContext('2d');
+      ctx.drawImage(img, 0, 0, s, s);
+
+      var item = document.createElement('div');
+      item.className = 'fav-item';
+
+      var preview = document.createElement('canvas');
+      preview.width = s; preview.height = s;
+      preview.style.width = Math.min(s, 80) + 'px';
+      preview.style.height = Math.min(s, 80) + 'px';
+      preview.getContext('2d').drawImage(img, 0, 0, s, s);
+
+      var sz = document.createElement('div');
+      sz.className = 'sz';
+      sz.textContent = s + ' x ' + s + (s === 180 ? ' (Apple)' : s === 192 ? ' (Android)' : s === 512 ? ' (PWA)' : '');
+
+      var btn = document.createElement('button');
+      btn.className = 'btn btn-sm btn-primary';
+      btn.textContent = '⬇ Download';
+      btn.addEventListener('click', function() {
+        cvs.toBlob(function(b) { PF.download(b, 'favicon-' + s + 'x' + s + '.png'); }, 'image/png');
+      });
+
+      item.appendChild(preview);
+      item.appendChild(sz);
+      item.appendChild(btn);
+      grid.appendChild(item);
+    });
+
+    document.getElementById('dz').classList.add('hide');
+    document.getElementById('editor').classList.remove('hide');
+  });
+});
+
+document.getElementById('resetBtn').addEventListener('click', function() {
+  document.getElementById('dz').classList.remove('hide'); document.getElementById('editor').classList.add('hide');
+});
+</script>
