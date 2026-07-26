@@ -54,8 +54,13 @@ PF.setupDrop = function(zoneEl, cb) {
     var f = e.dataTransfer.files[0];
     if (f) cb(f);
   });
+  zoneEl.addEventListener('click', function(e) {
+    if (e.target === fileInput) return;
+    if (fileInput) fileInput.click();
+  });
   if (fileInput) fileInput.addEventListener('change', function() {
     if (this.files[0]) cb(this.files[0]);
+    this.value = '';
   });
 };
 
