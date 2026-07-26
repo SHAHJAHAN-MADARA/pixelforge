@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://SHAHJAHAN-MADARA.github.io/pixelforge/sitemap.xml
+Sitemap: https://shahjahan-madara.github.io/pixelforge/sitemap.xml
